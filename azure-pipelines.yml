@@ -1,0 +1,69 @@
+#
+# Simple Azure Pipelines build configuration for Linux, macOS, and Windows
+# 
+
+trigger:
+- master
+- v0.12
+- v0.14
+
+jobs:
+- job: Linux
+  strategy:
+    matrix:
+      ruby_26:
+        containerImage: ruby:2.6.2
+      ruby_25:
+        containerImage: ruby:2.5.5
+      ruby_24:
+        containerImage: ruby:2.4.6
+      ruby_22:
+        containerImage: ruby:2.2.10
+      ruby_21:
+        containerImage: ruby:2.1.10
+  container: $[ variables['containerImage'] ]
+  steps:
+  - bash: |
+      mkdir -p /dev/shm/tmp
+      ln -s /dev/shm/tmp ./test/tmp
+    displayName: Initialize test/tmp
+    # This is needed to avoid issues with StatWatcher not notifying on file changes
+
+  - template: azure-pipelines-steps.yml
+
+- job: macOS
+  pool:
+    vmImage: macos-10.13
+  strategy:
+    matrix:
+      ruby_26:
+        RUBY_VERSION: '>=2.6'
+        SKIP_RVM: true
+      ruby_24:
+        RUBY_VERSION: 2.4.5
+      ruby_21:
+        RUBY_VERSION: 2.1.10
+      ruby_head:
+        RUBY_VERSION: ruby-head
+  steps:
+  - bash: |
+      curl -sSL https://get.rvm.io | bash -s stable      
+      source ~/.rvm/scripts/rvm
+      rvm install $RUBY_VERSION --default
+    displayName: Install Ruby (via rvm)
+    condition: not(variables.SKIP_RVM)
+
+  #- task: UseRubyVersion@0
+  #  inputs:
+  #    versionSpec: '>= 2.4'
+  #  displayName: Install Ruby (built-in)
+  #  condition: variables.SKIP_RVM
+
+  - script: mkdir -p ./test/tmp
+    displayName: Initialize test/tmp
+    # Note: this is needed to avoid permission problems later in some tests
+
+  - template: azure-pipelines-steps.yml
+
+#- job: Windows TODO
+   

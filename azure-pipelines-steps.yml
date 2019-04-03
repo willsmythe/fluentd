@@ -1,0 +1,12 @@
+steps:
+- script: |
+    ruby --version
+    bundle --version
+    gem --version
+  displayName: Show versions
+
+- script: bundle install --retry=3 --jobs=4
+  displayName: Install gems
+
+- script: bundle exec rake test TESTOPTS=-v
+  displayName: Test
