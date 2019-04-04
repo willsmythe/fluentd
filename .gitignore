@@ -18,6 +18,7 @@ fluentd
 pkg/*
 test/tmp/*
 test/config/tmp/*
+test/reports/*
 make_dist.sh
 Gemfile.local
 .ruby-version

@@ -48,4 +48,5 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency("test-unit", ["~> 3.2"])
   gem.add_development_dependency("test-unit-rr", ["~> 1.0"])
   gem.add_development_dependency("oj", [">= 2.14", "< 4"])
+  gem.add_development_dependency("ci_reporter_test_unit", ["~> 1.0"])
 end

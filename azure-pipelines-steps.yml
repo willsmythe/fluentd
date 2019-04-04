@@ -8,5 +8,13 @@ steps:
 - script: bundle install --retry=3 --jobs=4
   displayName: Install gems
 
-- script: bundle exec rake test TESTOPTS=-v
+- script: bundle exec rake ci TESTOPTS=-v
   displayName: Test
+
+- task: PublishTestResults@2
+  inputs:
+    testResultsFormat: 'JUnit'
+    testResultsFiles: 'test/reports/*.xml' 
+    mergeTestResults: true
+    testRunTitle: '$(Agent.JobName)'
+  condition: always()
