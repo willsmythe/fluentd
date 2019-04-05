@@ -795,11 +795,14 @@ class PluginLoggerTest < Test::Unit::TestCase
       @log = Fluent::PluginLogger.new(@logger)
     end
 
+    @timestamp = Time.parse("2016-04-21 11:58:41 +0900")
+    @timestamp_str = @timestamp.strftime("%Y-%m-%d %H:%M:%S %z")
+
     data(
-      text: [:text, "2016-04-21 11:58:41 +0900 [info]: yaaay\n"],
-      json: [:json, %Q({"time":"2016-04-21 11:58:41 +0900","level":"info","message":"yaaay"}\n)],
+      text: [:text, "#{@timestamp_str}d [info]: yaaay\n"],
+      json: [:json, %Q({"time":"#{@timestamp_str}","level":"info","message":"yaaay"}\n)],
     )
-    def test_format(data)
+    def test_format(data)        
       fmt, expected_log_line = data
       @log.format = fmt
       @log.info "yaaay"
