@@ -1,6 +1,10 @@
 #
-# Azure Pipelines build configuration for fluentd on Linux, macOS, and Windows (TODO)
-# 
+# Azure Pipelines build configuration for fluentd on Linux, macOS, and Windows
+#
+# Notes:
+#  1. Currently using RVM to install Ruby on macOS. We should switch to the built-in task when available. See https://github.com/Microsoft/azure-pipelines-image-generation/issues/834
+#  2. AppVeyor currently builds with Ruby 2.2 and 2.3 (both x86 and x64) --- should we do the same?
+#
 
 trigger:
 - master
@@ -12,25 +16,23 @@ jobs:
   strategy:
     matrix:
       ruby_26:
-        IMAGE: ruby:2.6.2
+        RUBY_IMAGE: ruby:2.6.2        
       ruby_25:
-        IMAGE: ruby:2.5.5
+        RUBY_IMAGE: ruby:2.5.5
       ruby_24:
-        IMAGE: ruby:2.4.6
+        RUBY_IMAGE: ruby:2.4.6
       ruby_22:
-        IMAGE: ruby:2.2.10
+        RUBY_IMAGE: ruby:2.2.10
+        BUNDLER_VERSION: 1.17.3
       ruby_21:
-        IMAGE: ruby:2.1.10
-      # TODO: use RVM to install ruby-head (unless there is an appropriate Docker image)
-      # ruby_head:
-      #   IMAGE: ''
-  container: $[ variables.IMAGE ]
-  steps:  
-  - bash: |
-      # Note: this is needed to avoid issues with StatWatcher not notifying on file changes
-      mkdir -p /dev/shm/tmp
-      ln -s /dev/shm/tmp ./test/tmp
-    displayName: Initialize test/tmp    
+        RUBY_IMAGE: ruby:2.1.10
+        BUNDLER_VERSION: 1.17.3
+      ruby_head:
+        RUBY_IMAGE: ruby:latest
+        RUBY_VERSION: ruby-head
+        USE_RVM: true
+  container: $[ variables.RUBY_IMAGE ]
+  steps:
   - template: azure-pipelines-steps.yml
 
 - job: macOS
@@ -39,54 +41,34 @@ jobs:
   strategy:
     matrix:
       ruby_26:
-        RUBY_VERSION: '>=2.6'
-        SKIP_RVM: true
+        RUBY_VERSION: 2.6.x
       ruby_24:
-        RUBY_VERSION: 2.4.5
+        RUBY_VERSION: 2.4.6
+        USE_RVM: true
       ruby_21:
         RUBY_VERSION: 2.1.10
+        BUNDLER_VERSION: 1.17.3
+        USE_RVM: true
       ruby_head:
         RUBY_VERSION: ruby-head
+        USE_RVM: true
   steps:
-  # Note: we are currently using RVM to install Ruby, but this is *really* slow since it must compile source for the versions we need
-  # We should switch to the UseRubyVersion task once the hosted macOS images supports the required versions
-  - bash: |
-      curl -sSL https://get.rvm.io | bash -s stable      
-      source ~/.rvm/scripts/rvm
-      rvm install $RUBY_VERSION --default
-    displayName: Install Ruby (via rvm)
-    condition: not(variables.SKIP_RVM)
-
-  # See note above. Also see https://github.com/Microsoft/azure-pipelines-image-generation/issues/834
-  #
-  #- task: UseRubyVersion@0
-  #  inputs:
-  #    versionSpec: '$(RUBY_VERSION)'
-  #  displayName: Install Ruby
-  #  condition: variables.SKIP_RVM
-
-  - script: mkdir -p ./test/tmp
-    displayName: Initialize test/tmp
-    # Note: this is needed to avoid permission problems in some tests
-
   - template: azure-pipelines-steps.yml
 
 - job: Windows
   pool:
     vmImage: vs2017-win2016
   strategy:
-    matrix:
+    matrix:      
       ruby_24:
         RUBY_VERSION: 2.4.x
+        USE_HOSTED_TOOL: true
       ruby_25:
         RUBY_VERSION: 2.5.x
+        USE_HOSTED_TOOL: true
       ruby_25_rapid:
         RUBY_VERSION: 2.5.x
         WIN_RAPID: true
+        USE_HOSTED_TOOL: true
   steps:
-  - task: UseRubyVersion@0
-    inputs:
-      versionSpec: '$(RUBY_VERSION)'
-    displayName: Install Ruby
-
-  - template: azure-pipelines-steps.yml      
+  - template: azure-pipelines-steps.yml

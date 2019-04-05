@@ -487,7 +487,7 @@ class TailInputTest < Test::Unit::TestCase
         f.puts "test3\ntest4"
         f.flush
       }
-      sleep 1
+      sleep(2)
       File.truncate("#{TMP_DIR}/tail.txt", 6)
     end
 

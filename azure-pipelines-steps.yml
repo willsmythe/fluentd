@@ -1,5 +1,29 @@
-steps:
-- script: gem install bundler
+steps:  
+- bash: |
+    # Install RVM
+    if [ hash gpg 2>/dev/null ]; then
+      gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+    fi
+    curl -sSL https://get.rvm.io | bash -s stable
+    source ~/.rvm/scripts/rvm
+
+    rvm install ${RUBY_VERSION}
+
+    # Propagate variables set by RVM (so they are available in later build steps). Needed since shell is launched with --no-profile/--no-rc
+    echo "##vso[task.setvariable variable=PATH]$PATH"
+    echo "##vso[task.setvariable variable=GEM_PATH]$GEM_PATH"
+    echo "##vso[task.setvariable variable=GEM_HOME]$GEM_HOME"
+  displayName: Install Ruby (using RVM)
+  condition: variables.USE_RVM
+
+- task: UseRubyVersion@0
+  inputs:
+    versionSpec: '$(RUBY_VERSION)'
+  displayName: Install Ruby (from hosted agent)
+  condition: variables.USE_HOSTED_TOOL
+
+- bash: gem install bundler -v "${BUNDLER_VERSION:-2.0.1}"
+  continueOnError: true
   displayName: Install bundler gem
 
 - script: |
@@ -7,19 +31,29 @@ steps:
     bundle --version
     gem --version
   displayName: Show versions
-    
+
+- bash: |    
+    # Note: needed to avoid issue with StatWatcher not notifying on file changes (on Linux) and permission problems
+    if [ -d "/dev/shm" ]; then
+      mkdir -p /dev/shm/tmp
+      ln -s /dev/shm/tmp ./test/tmp
+    else
+      mkdir -p ./test/tmp
+    fi
+  displayName: Initialize test temp directory
+
 - script: bundle install --retry=3 --jobs=4
   displayName: Install gems
 
-- script: bundle exec rake ci TESTOPTS=-v
+- script: bundle exec rake test TESTOPTS=-v
   displayName: Test
 
 # TODO: there was an issue publishing JUnit test reports (Value was either too large or too small for an Int32.). Need to investigate.
-- task: PublishTestResults@2
-  inputs:
-    testResultsFormat: 'JUnit'
-    testResultsFiles: 'test/reports/*.xml' 
-    mergeTestResults: true
-    testRunTitle: '$(Agent.JobName)'
-    publishRunAttachments: true
-  condition: variables.WIN_RAPID
+# - task: PublishTestResults@2
+#   inputs:
+#     testResultsFormat: 'JUnit'
+#     testResultsFiles: 'test/reports/*.xml' 
+#     mergeTestResults: true
+#     testRunTitle: '$(Agent.JobName)'
+#     publishRunAttachments: true
+#   condition: variables.WIN_RAPID
