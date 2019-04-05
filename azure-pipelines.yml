@@ -1,5 +1,5 @@
 #
-# Azure Pipelines build configuration for fluentd on Linux, macOS, and Windows (TODO)
+# Azure Pipelines build configuration for fluentd on Linux, macOS, and Windows
 # 
 
 trigger:
@@ -21,16 +21,16 @@ jobs:
         IMAGE: ruby:2.2.10
       ruby_21:
         IMAGE: ruby:2.1.10
-      # TODO: use RVM to install ruby-head (unless there is an appropriate Docker image)
+      # TODO: use RVM to install ruby-head (unless there is an appropriate Docker image that can be used)
       # ruby_head:
       #   IMAGE: ''
   container: $[ variables.IMAGE ]
-  steps:  
+  steps:
+  # Note: this is needed to avoid issues with StatWatcher not notifying on file changes
   - bash: |
-      # Note: this is needed to avoid issues with StatWatcher not notifying on file changes
       mkdir -p /dev/shm/tmp
       ln -s /dev/shm/tmp ./test/tmp
-    displayName: Initialize test/tmp    
+    displayName: Initialize test/tmp
   - template: azure-pipelines-steps.yml
 
 - job: macOS
@@ -57,7 +57,7 @@ jobs:
     displayName: Install Ruby (via rvm)
     condition: not(variables.SKIP_RVM)
 
-  # See note above. Also see https://github.com/Microsoft/azure-pipelines-image-generation/issues/834
+  # TODO. See note above and https://github.com/Microsoft/azure-pipelines-image-generation/issues/834
   #
   #- task: UseRubyVersion@0
   #  inputs:
@@ -65,10 +65,10 @@ jobs:
   #  displayName: Install Ruby
   #  condition: variables.SKIP_RVM
 
+  # Note: this is needed to avoid permission problems in some tests
   - script: mkdir -p ./test/tmp
     displayName: Initialize test/tmp
-    # Note: this is needed to avoid permission problems in some tests
-
+  
   - template: azure-pipelines-steps.yml
 
 - job: Windows
@@ -76,6 +76,7 @@ jobs:
     vmImage: vs2017-win2016
   strategy:
     matrix:
+      # TODO: AppVeyor is currently building on 2.2 and 2.3 (and both x86 and x64) --- should we?
       ruby_24:
         RUBY_VERSION: 2.4.x
       ruby_25:
@@ -88,5 +89,8 @@ jobs:
     inputs:
       versionSpec: '$(RUBY_VERSION)'
     displayName: Install Ruby
+
+  - script: gem install bundler
+    displayName: Install bundler gem
 
   - template: azure-pipelines-steps.yml      

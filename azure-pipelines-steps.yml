@@ -1,7 +1,4 @@
 steps:
-- script: gem install bundler
-  displayName: Install bundler gem
-
 - script: |
     ruby --version
     bundle --version
@@ -11,7 +8,7 @@ steps:
 - script: bundle install --retry=3 --jobs=4
   displayName: Install gems
 
-- script: bundle exec rake ci TESTOPTS=-v
+- script: bundle exec rake ci
   displayName: Test
 
 # TODO: there was an issue publishing JUnit test reports (Value was either too large or too small for an Int32.). Need to investigate.
