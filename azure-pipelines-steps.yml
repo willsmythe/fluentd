@@ -11,10 +11,12 @@ steps:
 - script: bundle exec rake ci TESTOPTS=-v
   displayName: Test
 
+# TODO: there was an issue publishing JUnit test reports (Value was either too large or too small for an Int32.). Need to investigate.
 - task: PublishTestResults@2
   inputs:
     testResultsFormat: 'JUnit'
     testResultsFiles: 'test/reports/*.xml' 
     mergeTestResults: true
     testRunTitle: '$(Agent.JobName)'
+    publishRunAttachments: true
   condition: always()

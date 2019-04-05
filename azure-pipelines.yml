@@ -1,5 +1,5 @@
 #
-# Simple Azure Pipelines build configuration for Linux, macOS, and Windows
+# Azure Pipelines build configuration for fluentd on Linux, macOS, and Windows (TODO)
 # 
 
 trigger:
@@ -21,14 +21,16 @@ jobs:
         containerImage: ruby:2.2.10
       ruby_21:
         containerImage: ruby:2.1.10
+      # TODO: use RVM to install ruby-head (unless there is an appropriate Docker image)
+      # ruby_head:
+      #   containerImage: ''
   container: $[ variables['containerImage'] ]
-  steps:
+  steps:  
   - bash: |
+      # Note: this is needed to avoid issues with StatWatcher not notifying on file changes
       mkdir -p /dev/shm/tmp
       ln -s /dev/shm/tmp ./test/tmp
-    displayName: Initialize test/tmp
-    # This is needed to avoid issues with StatWatcher not notifying on file changes
-
+    displayName: Initialize test/tmp    
   - template: azure-pipelines-steps.yml
 
 - job: macOS
@@ -46,6 +48,8 @@ jobs:
       ruby_head:
         RUBY_VERSION: ruby-head
   steps:
+  # Note: we are currently using RVM to install Ruby, but this is *really* slow since it must compile source for the versions we need
+  # We should switch to the UseRubyVersion task once the hosted macOS images supports the required versions
   - bash: |
       curl -sSL https://get.rvm.io | bash -s stable      
       source ~/.rvm/scripts/rvm
@@ -53,15 +57,17 @@ jobs:
     displayName: Install Ruby (via rvm)
     condition: not(variables.SKIP_RVM)
 
+  # See note above. Also see https://github.com/Microsoft/azure-pipelines-image-generation/issues/834
+  #
   #- task: UseRubyVersion@0
   #  inputs:
-  #    versionSpec: '>= 2.4'
-  #  displayName: Install Ruby (built-in)
+  #    versionSpec: '$(RUBY_VERSION)'
+  #  displayName: Install Ruby
   #  condition: variables.SKIP_RVM
 
   - script: mkdir -p ./test/tmp
     displayName: Initialize test/tmp
-    # Note: this is needed to avoid permission problems later in some tests
+    # Note: this is needed to avoid permission problems in some tests
 
   - template: azure-pipelines-steps.yml
 
