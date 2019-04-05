@@ -12,19 +12,19 @@ jobs:
   strategy:
     matrix:
       ruby_26:
-        containerImage: ruby:2.6.2
+        IMAGE: ruby:2.6.2
       ruby_25:
-        containerImage: ruby:2.5.5
+        IMAGE: ruby:2.5.5
       ruby_24:
-        containerImage: ruby:2.4.6
+        IMAGE: ruby:2.4.6
       ruby_22:
-        containerImage: ruby:2.2.10
+        IMAGE: ruby:2.2.10
       ruby_21:
-        containerImage: ruby:2.1.10
+        IMAGE: ruby:2.1.10
       # TODO: use RVM to install ruby-head (unless there is an appropriate Docker image)
       # ruby_head:
-      #   containerImage: ''
-  container: $[ variables['containerImage'] ]
+      #   IMAGE: ''
+  container: $[ variables.IMAGE ]
   steps:  
   - bash: |
       # Note: this is needed to avoid issues with StatWatcher not notifying on file changes
@@ -71,5 +71,22 @@ jobs:
 
   - template: azure-pipelines-steps.yml
 
-#- job: Windows TODO
-   
+- job: Windows
+  pool:
+    vmImage: vs2017-win2016
+  strategy:
+    matrix:
+      ruby_24:
+        RUBY_VERSION: 2.4.x
+      ruby_25:
+        RUBY_VERSION: 2.5.x
+      ruby_25_rapid:
+        RUBY_VERSION: 2.5.x
+        WIN_RAPID: true
+  steps:
+  - task: UseRubyVersion@0
+    inputs:
+      versionSpec: '$(RUBY_VERSION)'
+    displayName: Install Ruby
+
+  - template: azure-pipelines-steps.yml      

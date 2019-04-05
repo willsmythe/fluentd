@@ -210,7 +210,7 @@ class ForwardInputTest < Test::Unit::TestCase
         }
       end
 
-      assert_equal(records, d.events.sort_by {|a| a[1] })
+      assert_equal(records, d.events.sort_by {|a| a[2]["a"] })
     end
 
     test 'json_with_newline' do
@@ -230,7 +230,7 @@ class ForwardInputTest < Test::Unit::TestCase
         }
       end
 
-      assert_equal(records, d.events.sort_by {|a| a[1] })
+      assert_equal(records, d.events.sort_by {|a| a[2]["a"] })
     end
   end
 
