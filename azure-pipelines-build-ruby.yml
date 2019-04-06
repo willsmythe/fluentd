@@ -55,14 +55,18 @@ jobs:
       export RUBY_BINARY=https://fluentdazp.blob.core.windows.net/binaries/osx/10.13/x86_64/${RUBY_STAMP}.tar.bz2
       source ~/.rvm/scripts/rvm
       rvm requirements
+      
       mkdir -p ~/rvm_binaries
       curl ${RUBY_BINARY} --output ~/rvm_binaries/${RUBY_STAMP}.tar.bz2
       rvm mount ~/rvm_binaries/${RUBY_STAMP}.tar.bz2
-      rvm use ${RUBY_STAMP} --default
-      echo "${PATH}"
-      which ruby
+      
+      rvm use ${RUBY_STAMP}
+      echo "$(rvm current)"
+      echo "##vso[task.setvariable variable=PATH]${PATH}"
     condition: ne(variables.MD5, '')
     displayName: Install Ruby
 
-  - bash: ruby --version
+  - bash: |
+      ruby --version
+      echo "$(rvm current)"
     displayName: Show Ruby version
