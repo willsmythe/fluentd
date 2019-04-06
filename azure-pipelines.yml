@@ -26,11 +26,6 @@ jobs:
       #   IMAGE: ''
   container: $[ format('ruby:{0}', variables.RUBY_VERSION) ]
   steps:
-  # Note: this is needed to avoid issues with StatWatcher not notifying on file changes
-  - bash: |
-      mkdir -p /dev/shm/tmp
-      ln -s /dev/shm/tmp ./test/tmp
-    displayName: Initialize test/tmp
   - template: azure-pipelines-steps.yml
 
 - job: macOS
@@ -62,10 +57,15 @@ jobs:
       # Install Ruby pre-reqs
       rvm requirements
 
-      # Download binary and RVM mount
+      # Download Ruby binary and install it      
       mkdir -p ~/rvm_binaries
       curl ${RUBY_BINARIES_URL}/${RUBY_VERSION}.tar.bz2 -o ~/rvm_binaries/ruby-${RUBY_VERSION}.tar.bz2
       rvm mount ~/rvm_binaries/ruby-${RUBY_VERSION}.tar.bz2
+      rvm use ruby-${RUBY_VERSION}      
+      # Propagate variables set by RVM (so they are available in later build steps). Needed since shell is launched with --no-profile/--no-rc
+      echo "##vso[task.setvariable variable=PATH]$PATH"
+      echo "##vso[task.setvariable variable=GEM_PATH]$GEM_PATH"
+      echo "##vso[task.setvariable variable=GEM_HOME]$GEM_HOME"
     displayName: Install Ruby (via rvm)
     condition: variables.USE_RVM
 
@@ -77,10 +77,6 @@ jobs:
   #  displayName: Install Ruby
   #  condition: variables.SKIP_RVM
 
-  # Note: this is needed to avoid permission problems in some tests
-  - script: mkdir -p ./test/tmp
-    displayName: Initialize test/tmp
-  
   - template: azure-pipelines-steps.yml
 
 - job: Windows
@@ -105,4 +101,4 @@ jobs:
   - script: gem install bundler
     displayName: Install bundler gem
 
-  - template: azure-pipelines-steps.yml      
+  - template: azure-pipelines-steps.yml

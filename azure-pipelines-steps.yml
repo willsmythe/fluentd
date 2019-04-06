@@ -1,7 +1,24 @@
 steps:
-- bash: |
-    bundle install --retry=3 --jobs=4
-    bundle exec rake test TESTOPTS=-v
+- script: |
+    ruby --version
+    bundle --version
+    gem --version
+  displayName: Show versions
+
+- bash: |    
+    # Note: needed to avoid issue with StatWatcher not notifying on file changes (on Linux) and permission problems
+    if [ -d "/dev/shm" ]; then
+      mkdir -p /dev/shm/tmp
+      ln -s /dev/shm/tmp ./test/tmp
+    else
+      mkdir -p ./test/tmp
+    fi
+  displayName: Initialize test temp directory
+
+- script: bundle install --retry=3 --jobs=4
+  displayName: Install gems
+
+- script: bundle exec rake test TESTOPTS=-v
   displayName: Test
 
 # TODO: there was an issue publishing JUnit test reports (Value was either too large or too small for an Int32.). Need to investigate.
