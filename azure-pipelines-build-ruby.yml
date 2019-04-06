@@ -59,6 +59,8 @@ jobs:
       curl ${RUBY_BINARY} --output ~/rvm_binaries/${RUBY_STAMP}.tar.bz2
       rvm mount ~/rvm_binaries/${RUBY_STAMP}.tar.bz2
       rvm use ${RUBY_STAMP} --default
+      echo "${PATH}"
+      which ruby
     condition: ne(variables.MD5, '')
     displayName: Install Ruby
 
