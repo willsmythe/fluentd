@@ -62,12 +62,10 @@ jobs:
       source ~/.rvm/scripts/rvm
 
       echo "$(rvm info)"
-
       echo "$(cat $RUBY_MD5)"
+      echo "$(ls -la ~/.rvm)"
 
-      echo "$(ls -laR ~/.rvm)"
-
-      rvm mount -r $RUBY_BINARY --verify-downloads 1
+      rvm mount -r $RUBY_BINARY --verify-downloads 2
       rvm requirements
       rvm install $RUBY_STAMP
     condition: ne(variables.MD5, '')
