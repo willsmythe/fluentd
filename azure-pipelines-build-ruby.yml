@@ -8,21 +8,61 @@ jobs:
     matrix:
       ruby_26:
         RUBY_STAMP: ruby-2.6.2
+        #MD5: 606bb0039b8cfdd7ee265fe590fdeca1
+        SHA512: 888292cf4d2f8862a26873aed0d4500d80272a9c8a6b6c89cf605f537dca946d403bb0ee9b930b9964f6d4dc5af127e5c5095c6cdec05f4f9d0a6f19f59bd806
       ruby_24:
         RUBY_STAMP: ruby-2.4.6
+        MD5: 4445bace8de1263eebf1747c2a7bf750
+        SHA512: 79c89e46d96ef3c0ef7854db6beb49170dc04064aaa3d0aab2b000ee75528a412b4c98b3d51ef08337f7116bcdd121639d95106bf14303d9ec1044dbfdf83cb2
       ruby_21:
         RUBY_STAMP: ruby-2.1.10
+        MD5: c3c44fdb406a303f3aa79bc7d9a10c1a
+        SHA512: d22059901d3f4b69b3e863c852da5f7bf19e7c19b426f0a780a5afbc7b325fdc69aadc36ba8bbc2a0c5b968f29ce1297dd506903277df51bd9f6b5d237fbbd64
       ruby_head:
         RUBY_STAMP: ruby-head
+        MD5: 42d8576dfd86bce7bbdffd710dc4c023
+        SHA512: 52f0657bc2a74b023ae864218b3c2d20fcd269ab6a70ad04cc5ae74e72c161d72a2084410a2888fbfec87389eb8e2a8786ff6c69eba89f04ae7d5b38fe29f140
   steps:
-  - bash: |
-      curl -sSL https://get.rvm.io | bash -s stable      
-      source ~/.rvm/scripts/rvm
-      rvm install $RUBY_STAMP
+  - bash: curl -sSL https://get.rvm.io | bash -s stable      
+    displayName: Install RVM
 
+  - bash: |
+      source ~/.rvm/scripts/rvm
+
+      rvm install $RUBY_STAMP
       rvm prepare $RUBY_STAMP
 
       md5sum $RUBY_STAMP.tar.bz2 > $RUBY_STAMP.checksums
       sha512sum $RUBY_STAMP.tar.bz2 >> $RUBY_STAMP.checksums
 
       echo "$(cat $RUBY_STAMP.checksums)"
+    condition: eq(MD5, '')
+    displayName: Build binaries
+
+  - task: CopyFiles@2 
+    inputs: 
+      contents: '*.tar.bz2' 
+      targetFolder: $(Build.ArtifactStagingDirectory)
+    condition: eq(MD5, '')
+
+  - task: PublishBuildArtifacts@1
+    inputs: 
+      pathtoPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: binaries
+    condition: eq(MD5, '')
+
+  - bash: |
+      export RUBY_BINARY=https://fluentdazp.blob.core.windows.net/binaries/osx/10.13/x86_64/${RUBY_STAMP}.tar.bz2
+      export RUBY_MD5=/usr/local/rvm/user/md5
+      export RUBY_SHA512=/usr/local/rvm/user/sha512
+
+      test "`grep "$RUBY_STAMP" $RUBY_MD5`" == "" && echo "$RUBY_BINARY=$MD5" >> $RUBY_MD5
+      test "`grep "$RUBY_STAMP" $RUBY_SHA512`" == "" && echo "$RUBY_BINARY=$SHA512" >> $RUBY_SHA512
+
+      source ~/.rvm/scripts/rvm
+
+      rvm mount -r $RUBY_BINARY
+      rvm requirements
+      rvm install $RUBY_STAMP
+    condition: ne(MD5, '')
+    displayName: Install Ruby
