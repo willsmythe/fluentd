@@ -1,4 +1,7 @@
 steps:
+- script: gem install bundler
+  continueOnError: true
+
 - script: |
     ruby --version
     bundle --version

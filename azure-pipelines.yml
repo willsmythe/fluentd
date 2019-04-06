@@ -98,7 +98,4 @@ jobs:
       versionSpec: '$(RUBY_VERSION)'
     displayName: Install Ruby
 
-  - script: gem install bundler
-    displayName: Install bundler gem
-
   - template: azure-pipelines-steps.yml
