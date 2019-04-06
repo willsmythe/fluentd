@@ -36,20 +36,20 @@ jobs:
       sha512sum $RUBY_STAMP.tar.bz2 >> $RUBY_STAMP.checksums
 
       echo "$(cat $RUBY_STAMP.checksums)"
-    condition: eq(MD5, '')
+    condition: eq(variables.MD5, '')
     displayName: Build binaries
 
   - task: CopyFiles@2 
     inputs: 
       contents: '*.tar.bz2' 
       targetFolder: $(Build.ArtifactStagingDirectory)
-    condition: eq(MD5, '')
+    condition: eq(variables.MD5, '')
 
   - task: PublishBuildArtifacts@1
     inputs: 
       pathtoPublish: $(Build.ArtifactStagingDirectory)
       artifactName: binaries
-    condition: eq(MD5, '')
+    condition: eq(variables.MD5, '')
 
   - bash: |
       export RUBY_BINARY=https://fluentdazp.blob.core.windows.net/binaries/osx/10.13/x86_64/${RUBY_STAMP}.tar.bz2
@@ -64,5 +64,5 @@ jobs:
       rvm mount -r $RUBY_BINARY
       rvm requirements
       rvm install $RUBY_STAMP
-    condition: ne(MD5, '')
+    condition: ne(variables.MD5, '')
     displayName: Install Ruby
