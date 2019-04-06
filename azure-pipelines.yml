@@ -48,7 +48,7 @@ jobs:
         RUBY_VERSION: head
         USE_RVM: true
   variables:
-    RUBY_BINARIES_URL: https://fluentdazp.blob.core.windows.net/binaries/osx/10.13/x86_64/
+    RUBY_BINARIES_URL: https://fluentdazp.blob.core.windows.net/binaries/osx/10.13/x86_64
   steps:
   # Note: we are currently using RVM to install Ruby, but this is *really* slow since it must compile source for the versions we need
   # We should switch to the UseRubyVersion task once the hosted macOS images supports the required versions
