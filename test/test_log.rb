@@ -799,7 +799,7 @@ class PluginLoggerTest < Test::Unit::TestCase
     @timestamp_str = @timestamp.strftime("%Y-%m-%d %H:%M:%S %z")
 
     data(
-      text: [:text, "#{@timestamp_str}d [info]: yaaay\n"],
+      text: [:text, "#{@timestamp_str} [info]: yaaay\n"],
       json: [:json, %Q({"time":"#{@timestamp_str}","level":"info","message":"yaaay"}\n)],
     )
     def test_format(data)        
