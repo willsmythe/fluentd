@@ -1,0 +1,28 @@
+
+
+jobs:
+- job: macOS
+  pool:
+    vmImage: macos-10.13
+  strategy:
+    matrix:
+      ruby_26:
+        RUBY_STAMP: ruby-2.6.2
+      ruby_24:
+        RUBY_STAMP: ruby-2.4.6
+      ruby_21:
+        RUBY_STAMP: ruby-2.1.10
+      ruby_head:
+        RUBY_STAMP: ruby-head
+  steps:
+  - bash: |
+      curl -sSL https://get.rvm.io | bash -s stable      
+      source ~/.rvm/scripts/rvm
+      rvm install $RUBY_STAMP
+
+      rvm prepare $RUBY_STAMP
+
+      md5sum $RUBY_STAMP.tar.bz2 > $RUBY_STAMP.checksums
+      sha512sum $RUBY_STAMP.tar.bz2 >> $RUBY_STAMP.checksums
+
+      echo "$(cat $RUBY_STAMP.checksums)"
