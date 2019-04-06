@@ -12,7 +12,7 @@ jobs:
         SHA512: 888292cf4d2f8862a26873aed0d4500d80272a9c8a6b6c89cf605f537dca946d403bb0ee9b930b9964f6d4dc5af127e5c5095c6cdec05f4f9d0a6f19f59bd806
       ruby_24:
         RUBY_STAMP: ruby-2.4.6
-        MD5: 4445bace8de1263eebf1747c2a7bf750
+        #MD5: 4445bace8de1263eebf1747c2a7bf750
         SHA512: 79c89e46d96ef3c0ef7854db6beb49170dc04064aaa3d0aab2b000ee75528a412b4c98b3d51ef08337f7116bcdd121639d95106bf14303d9ec1044dbfdf83cb2
       ruby_21:
         RUBY_STAMP: ruby-2.1.10
@@ -23,7 +23,7 @@ jobs:
         MD5: 42d8576dfd86bce7bbdffd710dc4c023
         SHA512: 52f0657bc2a74b023ae864218b3c2d20fcd269ab6a70ad04cc5ae74e72c161d72a2084410a2888fbfec87389eb8e2a8786ff6c69eba89f04ae7d5b38fe29f140
   steps:
-  - bash: curl -sSL https://get.rvm.io | bash -s stable      
+  - bash: curl -sSL https://get.rvm.io | bash -s stable
     displayName: Install RVM
 
   - bash: |
@@ -53,13 +53,15 @@ jobs:
 
   - bash: |
       export RUBY_BINARY=https://fluentdazp.blob.core.windows.net/binaries/osx/10.13/x86_64/${RUBY_STAMP}.tar.bz2
-      export RUBY_MD5=/usr/local/rvm/user/md5
-      export RUBY_SHA512=/usr/local/rvm/user/sha512
+      export RUBY_MD5=~/.rvm/user/md5
+      export RUBY_SHA512=~/.rvm/user/sha512
 
       test "`grep "$RUBY_STAMP" $RUBY_MD5`" == "" && echo "$RUBY_BINARY=$MD5" >> $RUBY_MD5
       test "`grep "$RUBY_STAMP" $RUBY_SHA512`" == "" && echo "$RUBY_BINARY=$SHA512" >> $RUBY_SHA512
 
       source ~/.rvm/scripts/rvm
+
+      echo "$(rvm info)"    
 
       rvm mount -r $RUBY_BINARY
       rvm requirements
