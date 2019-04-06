@@ -59,15 +59,16 @@ jobs:
       mkdir -p ~/rvm_binaries
       curl ${RUBY_BINARY} --output ~/rvm_binaries/${RUBY_STAMP}.tar.bz2
       rvm mount ~/rvm_binaries/${RUBY_STAMP}.tar.bz2
-      
-      rvm use ${RUBY_STAMP} --default
-      echo "$(rvm current)"
-      echo "##vso[task.setvariable variable=PATH]${PATH}"
     condition: ne(variables.MD5, '')
     displayName: Install Ruby
 
   - bash: |
-      #rvm use ${RUBY_STAMP}
-      ruby --version
+      echo "$(printenv)"
+      echo "-----"
+      rvm use ${RUBY_STAMP}
+      echo "-----"
+      echo "$(printenv)"
+      echo "-----"
       echo "$(rvm current)"
+      ruby --version
     displayName: Show Ruby version

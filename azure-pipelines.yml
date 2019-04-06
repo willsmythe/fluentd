@@ -12,19 +12,19 @@ jobs:
   strategy:
     matrix:
       ruby_26:
-        IMAGE: ruby:2.6.2
+        RUBY_VERSION: 2.6.2
       ruby_25:
-        IMAGE: ruby:2.5.5
+        RUBY_VERSION: 2.5.5
       ruby_24:
-        IMAGE: ruby:2.4.6
+        RUBY_VERSION: 2.4.6
       ruby_22:
-        IMAGE: ruby:2.2.10
+        RUBY_VERSION: 2.2.10
       ruby_21:
-        IMAGE: ruby:2.1.10
+        RUBY_VERSION: 2.1.10
       # TODO: use RVM to install ruby-head (unless there is an appropriate Docker image that can be used)
       # ruby_head:
       #   IMAGE: ''
-  container: $[ variables.IMAGE ]
+  container: $[ format('ruby:{0}', variables.RUBY_VERSION) ]
   steps:
   # Note: this is needed to avoid issues with StatWatcher not notifying on file changes
   - bash: |
@@ -40,22 +40,34 @@ jobs:
     matrix:
       ruby_26:
         RUBY_VERSION: '>=2.6'
-        SKIP_RVM: true
       ruby_24:
-        RUBY_VERSION: 2.4.5
+        RUBY_VERSION: 2.4.6
+        USE_RVM: true
       ruby_21:
         RUBY_VERSION: 2.1.10
+        USE_RVM: true
       ruby_head:
-        RUBY_VERSION: ruby-head
+        RUBY_VERSION: head
+        USE_RVM: true
+  variables:
+    RUBY_BINARIES_URL: https://fluentdazp.blob.core.windows.net/binaries/osx/10.13/x86_64/
   steps:
   # Note: we are currently using RVM to install Ruby, but this is *really* slow since it must compile source for the versions we need
   # We should switch to the UseRubyVersion task once the hosted macOS images supports the required versions
   - bash: |
-      curl -sSL https://get.rvm.io | bash -s stable      
+      # Install RVM
+      curl -sSL https://get.rvm.io | bash -s stable
       source ~/.rvm/scripts/rvm
-      rvm install $RUBY_VERSION --default
+
+      # Install Ruby pre-reqs
+      rvm requirements
+
+      # Download binary and RVM mount
+      mkdir -p ~/rvm_binaries
+      curl ${RUBY_BINARIES_URL}/${RUBY_VERSION}.tar.bz2 -o ~/rvm_binaries/ruby-${RUBY_VERSION}.tar.bz2
+      rvm mount ~/rvm_binaries/ruby-${RUBY_VERSION}.tar.bz2
     displayName: Install Ruby (via rvm)
-    condition: not(variables.SKIP_RVM)
+    condition: variables.USE_RVM
 
   # TODO. See note above and https://github.com/Microsoft/azure-pipelines-image-generation/issues/834
   #
