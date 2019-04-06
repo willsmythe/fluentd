@@ -64,9 +64,11 @@ jobs:
       echo "$(rvm info)"
       echo "$(cat $RUBY_MD5)"
       echo "$(ls -la ~/.rvm)"
+      echo "$(rmv help mount)"
 
-      rvm mount -r $RUBY_BINARY --verify-downloads 2
       rvm requirements
-      rvm install $RUBY_STAMP
+      rvm mount -r $RUBY_BINARY --verify-downloads 2
+      
+      #rvm install $RUBY_STAMP
     condition: ne(variables.MD5, '')
     displayName: Install Ruby
