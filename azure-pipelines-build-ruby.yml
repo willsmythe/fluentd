@@ -60,13 +60,14 @@ jobs:
       curl ${RUBY_BINARY} --output ~/rvm_binaries/${RUBY_STAMP}.tar.bz2
       rvm mount ~/rvm_binaries/${RUBY_STAMP}.tar.bz2
       
-      rvm use ${RUBY_STAMP}
+      rvm use ${RUBY_STAMP} --default
       echo "$(rvm current)"
       echo "##vso[task.setvariable variable=PATH]${PATH}"
     condition: ne(variables.MD5, '')
     displayName: Install Ruby
 
   - bash: |
+      #rvm use ${RUBY_STAMP}
       ruby --version
       echo "$(rvm current)"
     displayName: Show Ruby version
