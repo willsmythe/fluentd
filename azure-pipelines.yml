@@ -19,8 +19,10 @@ jobs:
         RUBY_VERSION: 2.4.6
       ruby_22:
         RUBY_VERSION: 2.2.10
+        BUNDLER_VERSION: 1.17.3
       ruby_21:
         RUBY_VERSION: 2.1.10
+        BUNDLER_VERSION: 1.17.3
       # TODO: use RVM to install ruby-head (unless there is an appropriate Docker image that can be used)
       # ruby_head:
       #   IMAGE: ''
@@ -40,6 +42,7 @@ jobs:
         USE_RVM: true
       ruby_21:
         RUBY_VERSION: 2.1.10
+        BUNDLER_VERSION: 1.17.3
         USE_RVM: true
       ruby_head:
         RUBY_VERSION: head
@@ -59,7 +62,7 @@ jobs:
 
       # Download Ruby binary and install it      
       mkdir -p ~/rvm_binaries
-      curl ${RUBY_BINARIES_URL}/${RUBY_VERSION}.tar.bz2 -o ~/rvm_binaries/ruby-${RUBY_VERSION}.tar.bz2
+      curl ${RUBY_BINARIES_URL}/ruby-${RUBY_VERSION}.tar.bz2 -o ~/rvm_binaries/ruby-${RUBY_VERSION}.tar.bz2
       rvm mount ~/rvm_binaries/ruby-${RUBY_VERSION}.tar.bz2
       rvm use ruby-${RUBY_VERSION}      
       # Propagate variables set by RVM (so they are available in later build steps). Needed since shell is launched with --no-profile/--no-rc

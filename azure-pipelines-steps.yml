@@ -1,6 +1,8 @@
 steps:
-- script: gem install bundler
+- bash: |
+    gem install bundler -v "${BUNDLER_VERSION:-2.0.1}"
   continueOnError: true
+  displayName: Install bundler gem
 
 - script: |
     ruby --version
