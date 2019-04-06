@@ -8,7 +8,7 @@ jobs:
     matrix:
       ruby_26:
         RUBY_STAMP: ruby-2.6.2
-        #MD5: 606bb0039b8cfdd7ee265fe590fdeca1
+        MD5: 606bb0039b8cfdd7ee265fe590fdeca1
         SHA512: 888292cf4d2f8862a26873aed0d4500d80272a9c8a6b6c89cf605f537dca946d403bb0ee9b930b9964f6d4dc5af127e5c5095c6cdec05f4f9d0a6f19f59bd806
       ruby_24:
         RUBY_STAMP: ruby-2.4.6
@@ -61,9 +61,13 @@ jobs:
 
       source ~/.rvm/scripts/rvm
 
-      echo "$(rvm info)"    
+      echo "$(rvm info)"
 
-      rvm mount -r $RUBY_BINARY
+      echo "$(cat $RUBY_MD5)"
+
+      echo "$(ls -laR ~/.rvm)"
+
+      rvm mount -r $RUBY_BINARY --verify-downloads 1
       rvm requirements
       rvm install $RUBY_STAMP
     condition: ne(variables.MD5, '')
