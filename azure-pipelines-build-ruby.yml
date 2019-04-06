@@ -53,21 +53,31 @@ jobs:
 
   - bash: |
       export RUBY_BINARY=https://fluentdazp.blob.core.windows.net/binaries/osx/10.13/x86_64/${RUBY_STAMP}.tar.bz2
-      export RUBY_MD5=~/.rvm/user/md5
-      export RUBY_SHA512=~/.rvm/user/sha512
-
-      test "`grep "$RUBY_STAMP" $RUBY_MD5`" == "" && echo "$RUBY_BINARY=$MD5" >> $RUBY_MD5
-      test "`grep "$RUBY_STAMP" $RUBY_SHA512`" == "" && echo "$RUBY_BINARY=$SHA512" >> $RUBY_SHA512
+      #export RUBY_MD5=~/.rvm/user/md5
+      #export RUBY_SHA512=~/.rvm/user/sha512
 
       source ~/.rvm/scripts/rvm
 
-      echo "$(rvm info)"
-      echo "$(cat $RUBY_MD5)"
-      echo "$(ls -la ~/.rvm)"
-      echo "$(rmv help mount)"
-
       rvm requirements
-      rvm mount -r $RUBY_BINARY --verify-downloads 2
+
+      mkdir -p ~/rvm_binaries
+      curl ${RUBY_BINARY} --output ~/rvm_binaries/${RUBY_STAMP}.tar.bz2
+      rvm mount ~/rvm_binaries/${RUBY_STAMP}.tar.bz2
+
+      rvm --default use ${RUBY_STAMP}
+
+      #test "`grep "$RUBY_STAMP" $RUBY_MD5`" == "" && echo "$RUBY_BINARY=$MD5" >> $RUBY_MD5
+      #test "`grep "$RUBY_STAMP" $RUBY_SHA512`" == "" && echo "$RUBY_BINARY=$SHA512" >> $RUBY_SHA512
+
+      
+
+      #echo "$(rvm info)"
+      #echo "$(cat $RUBY_MD5)"
+      #echo "$(ls -la ~/.rvm/user)"
+      #echo "$(rmv help mount)"
+
+      
+      #rvm mount -r $RUBY_BINARY --verify-downloads 2
       
       #rvm install $RUBY_STAMP
     condition: ne(variables.MD5, '')
