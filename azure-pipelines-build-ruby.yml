@@ -12,8 +12,8 @@ jobs:
         SHA512: 888292cf4d2f8862a26873aed0d4500d80272a9c8a6b6c89cf605f537dca946d403bb0ee9b930b9964f6d4dc5af127e5c5095c6cdec05f4f9d0a6f19f59bd806
       ruby_24:
         RUBY_STAMP: ruby-2.4.6
-        #MD5: 4445bace8de1263eebf1747c2a7bf750
-        SHA512: 79c89e46d96ef3c0ef7854db6beb49170dc04064aaa3d0aab2b000ee75528a412b4c98b3d51ef08337f7116bcdd121639d95106bf14303d9ec1044dbfdf83cb2
+        MD5: a92d1f197fdc576cf297f9156a4ea497
+        SHA512: 85941632d45c4048e76cb8db7b3437e52741b19f5505a8d63ad62813487d1bee24adf3ebd25beef7edaf6ae309a6844f37b2b8eccef95b8e6985a29c315ad5ef
       ruby_21:
         RUBY_STAMP: ruby-2.1.10
         MD5: c3c44fdb406a303f3aa79bc7d9a10c1a
@@ -53,13 +53,11 @@ jobs:
 
   - bash: |
       export RUBY_BINARY=https://fluentdazp.blob.core.windows.net/binaries/osx/10.13/x86_64/${RUBY_STAMP}.tar.bz2
-
       source ~/.rvm/scripts/rvm
-
+      rvm requirements
       mkdir -p ~/rvm_binaries
       curl ${RUBY_BINARY} --output ~/rvm_binaries/${RUBY_STAMP}.tar.bz2
       rvm mount ~/rvm_binaries/${RUBY_STAMP}.tar.bz2
-
       rvm use ${RUBY_STAMP} --default
     condition: ne(variables.MD5, '')
     displayName: Install Ruby
