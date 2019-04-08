@@ -45,14 +45,13 @@ steps:
   displayName: Initialize test temp directory
 
 - bash: |
-    # Temporary workaround to ensure omitted test cases get reported as "skipped" (not "failed")
+    # Temporary workaround to ensure "omitted" and "notifications" test cases don't get reported as errors/failures
     # See: https://github.com/ci-reporter/ci_reporter_test_unit/pull/11
-    echo gem \'ci_reporter_test_unit\', git: \'git://github.com/willsmythe/ci_reporter_test_unit\', branch: \'omit-reported-as-failure\' > Gemfile.local
-    
+    echo gem \'ci_reporter_test_unit\', git: \'git://github.com/willsmythe/ci_reporter_test_unit\', branch: \'omit-notification-reported-as-failure\' > Gemfile.local
     bundle install --retry=3 --jobs=4
   displayName: Install gems
 
-- script: bundle exec rake ci TESTOPTS=-v
+- bash: USE_CI_REPORTER=true bundle exec rake test
   displayName: Test
 
 - task: PublishTestResults@2

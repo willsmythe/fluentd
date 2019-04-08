@@ -4,11 +4,13 @@ require "bundler/gem_tasks"
 require 'fileutils'
 require 'rake/testtask'
 require 'rake/clean'
-require 'ci/reporter/rake/test_unit'
 
-task test: [:base_test]
-
-task :ci => ['ci:setup:testunit', :test]
+if ENV['USE_CI_REPORTER'] == 'true'
+  require 'ci/reporter/rake/test_unit'
+  task test: ['ci:setup:testunit', :base_test]
+else
+  task test: [:base_test]
+end
 
 # 1. update ChangeLog and lib/fluent/version.rb
 # 2. bundle && bundle exec rake build:all
