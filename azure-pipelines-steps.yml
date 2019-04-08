@@ -26,11 +26,11 @@ steps:
   continueOnError: true
   displayName: Install bundler gem
 
-- script: |
+- bash: |
     ruby --version
     bundle --version
     gem --version
-  displayName: Show versions
+  displayName: Show Ruby version
 
 - bash: |    
     # Note: needed to avoid issue with StatWatcher not notifying on file changes (on Linux) and permission problems
@@ -45,15 +45,14 @@ steps:
 - script: bundle install --retry=3 --jobs=4
   displayName: Install gems
 
-- script: bundle exec rake test TESTOPTS=-v
+- script: bundle exec rake ci TESTOPTS=-v
   displayName: Test
 
-# TODO: there was an issue publishing JUnit test reports (Value was either too large or too small for an Int32.). Need to investigate.
-# - task: PublishTestResults@2
-#   inputs:
-#     testResultsFormat: 'JUnit'
-#     testResultsFiles: 'test/reports/*.xml' 
-#     mergeTestResults: true
-#     testRunTitle: '$(Agent.JobName)'
-#     publishRunAttachments: true
-#   condition: variables.WIN_RAPID
+- task: PublishTestResults@2
+  inputs:
+    testResultsFormat: 'JUnit'
+    testResultsFiles: 'test/reports/*.xml' 
+    mergeTestResults: true
+    testRunTitle: '$(Agent.JobName)'
+    publishRunAttachments: true
+  condition: succeededOrFailed()
