@@ -4,7 +4,7 @@
 # Notes:
 #  1. Currently using RVM to install Ruby on macOS. We should switch to the built-in task when available. See https://github.com/Microsoft/azure-pipelines-image-generation/issues/834
 #  2. AppVeyor currently builds with Ruby 2.2 and 2.3 (both x86 and x64) --- should we do the same?
-#
+#  3. Currently not building against ruby-head on Linux.
 
 trigger:
 - master
@@ -29,10 +29,10 @@ jobs:
       ruby_21:
         RUBY_IMAGE: ruby:2.1.10
         BUNDLER_VERSION: 1.17.3
-      ruby_head:
-        RUBY_IMAGE: ruby:latest
-        RUBY_VERSION: ruby-head
-        USE_RVM: true
+      #ruby_head:
+      #  RUBY_IMAGE: ruby:latest
+      #  RUBY_VERSION: ruby-head
+      #  USE_RVM: true
   container: $[ variables.RUBY_IMAGE ]
   steps:
   - template: azure-pipelines-steps.yml

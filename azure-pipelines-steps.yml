@@ -44,7 +44,11 @@ steps:
     fi
   displayName: Initialize test temp directory
 
-- script: bundle install --retry=3 --jobs=4
+- bash: |
+    # Temporary workaround to ensure omitted test cases get reported as "skipped" (not "failed")
+    # See: https://github.com/ci-reporter/ci_reporter_test_unit/pull/11
+    echo gem \'ci_reporter_test_unit\', git: \'git://github.com/willsmythe/ci_reporter_test_unit\', branch: \'omit-reported-as-failure\' > Gemfile.local
+    bundle install --retry=3 --jobs=4
   displayName: Install gems
 
 - script: bundle exec rake ci TESTOPTS=-v
@@ -55,6 +59,6 @@ steps:
     testResultsFormat: 'JUnit'
     testResultsFiles: 'test/reports/*.xml' 
     mergeTestResults: true
-    testRunTitle: '$(Agent.JobName)'
+    testRunTitle: '$(System.JobIdentifier)'
     publishRunAttachments: true
   condition: succeededOrFailed()
