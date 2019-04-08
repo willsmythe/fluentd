@@ -48,6 +48,7 @@ steps:
     # Temporary workaround to ensure omitted test cases get reported as "skipped" (not "failed")
     # See: https://github.com/ci-reporter/ci_reporter_test_unit/pull/11
     echo gem \'ci_reporter_test_unit\', git: \'git://github.com/willsmythe/ci_reporter_test_unit\', branch: \'omit-reported-as-failure\' > Gemfile.local
+    
     bundle install --retry=3 --jobs=4
   displayName: Install gems
 

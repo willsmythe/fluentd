@@ -2,9 +2,12 @@
 # Azure Pipelines build configuration for fluentd on Linux, macOS, and Windows
 #
 # Notes:
-#  1. Currently using RVM to install Ruby on macOS. We should switch to the built-in task when available. See https://github.com/Microsoft/azure-pipelines-image-generation/issues/834
-#  2. AppVeyor currently builds with Ruby 2.2 and 2.3 (both x86 and x64) --- should we do the same?
-#  3. Currently not building against ruby-head on Linux.
+#
+#  1. Linux: not currently testing against ruby-head --- important?
+#  2. macOS: currently using RVM to install Ruby on macOS --- we should switch to built-in task when ready (see https://github.com/Microsoft/azure-pipelines-image-generation/issues/834)
+#  3. Windows: AppVeyor tests against Ruby 2.2 and 2.3 (x86 and x64); we are only testing against 2.4 and 2.5 (x64) --- important?
+#  4. General: test results are reported via a *patched* version of ci_reporter_test_unit (otherwise "omitted" tests would be reported as failed). See https://github.com/ci-reporter/ci_reporter_test_unit/pull/11
+#
 
 trigger:
 - master
