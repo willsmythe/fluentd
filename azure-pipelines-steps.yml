@@ -44,6 +44,12 @@ steps:
     fi
   displayName: Initialize test temp directory
 
+- task: RestoreCache@0
+  inputs:
+    key: $(Agent.OS)_$(RUBY_VERSION)
+    path: $(Build.SourcesDirectory)/vendor/bundle
+
+
 - bash: |
     # Temporary workaround to ensure "omitted" and "notifications" test cases don't get reported as errors/failures
     # See: https://github.com/ci-reporter/ci_reporter_test_unit/pull/11
@@ -51,14 +57,20 @@ steps:
     bundle install --retry=3 --jobs=4
   displayName: Install gems
 
-- bash: USE_CI_REPORTER=true bundle exec rake test
-  displayName: Test
-
-- task: PublishTestResults@2
+- task: SaveCache@0
   inputs:
-    testResultsFormat: 'JUnit'
-    testResultsFiles: 'test/reports/*.xml' 
-    mergeTestResults: true
-    testRunTitle: '$(System.JobIdentifier)'
-    publishRunAttachments: true
-  condition: succeededOrFailed()
+    key: $(Agent.OS)_$(RUBY_VERSION)
+    path: $(Build.SourcesDirectory)/vendor/bundle
+
+
+# - bash: USE_CI_REPORTER=true bundle exec rake test
+#   displayName: Test
+
+# - task: PublishTestResults@2
+#   inputs:
+#     testResultsFormat: 'JUnit'
+#     testResultsFiles: 'test/reports/*.xml' 
+#     mergeTestResults: true
+#     testRunTitle: '$(System.JobIdentifier)'
+#     publishRunAttachments: true
+#   condition: succeededOrFailed()

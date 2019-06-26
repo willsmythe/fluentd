@@ -14,6 +14,10 @@ trigger:
 - v0.12
 - v0.14
 
+variables:
+  SKIP_MACOS: true
+  SKIP_WINDWS: true
+
 jobs:
 - job: Linux
   pool:
@@ -41,6 +45,7 @@ jobs:
   - template: azure-pipelines-steps.yml
 
 - job: macOS
+  condition: not(variables['SKIP_MACOS'])
   pool:
     vmImage: macos-10.13
   strategy:
@@ -61,6 +66,7 @@ jobs:
   - template: azure-pipelines-steps.yml
 
 - job: Windows
+  condition: not(variables['SKIP_WINDOWS'])
   pool:
     vmImage: vs2017-win2016
   strategy:
